@@ -5,12 +5,12 @@ import os
 
 app = Flask(__name__)
 
-# Use Groq API endpoint (fully OpenAI-compatible)
+# Set Groq API key and endpoint
 openai.api_key = os.getenv("GROQ_API_KEY")
 openai.api_base = "https://api.groq.com/openai/v1"
 
 if not openai.api_key:
-    raise ValueError("Missing GROQ API key. Add it as 'GROQ_API_KEY' in your environment.")
+    raise ValueError("Missing GROQ API key. Set it as 'GROQ_API_KEY' in your environment.")
 
 # Cooldown tracking per player
 cooldowns = {}
@@ -51,7 +51,7 @@ def chat():
         print(f"[Watcher] {player} said: {message}")
 
         response = openai.chat.completions.create(
-            model="mixtral-8x7b-32768",  # Groq's fast, free model
+            model="mixtral-8x7b-32768",  # Groq-supported model
             messages=[
                 {"role": "system", "content": CREEPY_RULES},
                 {"role": "user", "content": f"{player} says: {message}"}
