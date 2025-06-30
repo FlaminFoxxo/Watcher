@@ -5,12 +5,12 @@ import os
 
 app = Flask(__name__)
 
-# Load OpenAI API key from environment variables (Replit secrets)
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Use Groq API endpoint (fully OpenAI-compatible)
+openai.api_key = os.getenv("GROQ_API_KEY")
+openai.api_base = "https://api.groq.com/openai/v1"
+
 if not openai.api_key:
-    raise ValueError(
-        "Missing OpenAI API key. Add it in Replit secrets as 'OPENAI_API_KEY'."
-    )
+    raise ValueError("Missing GROQ API key. Add it as 'GROQ_API_KEY' in your environment.")
 
 # Cooldown tracking per player
 cooldowns = {}
@@ -30,7 +30,6 @@ Rules:
 
 You may not speak more than one or two sentences.
 """
-
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -52,7 +51,7 @@ def chat():
         print(f"[Watcher] {player} said: {message}")
 
         response = openai.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="mixtral-8x7b-32768",  # Groq's fast, free model
             messages=[
                 {"role": "system", "content": CREEPY_RULES},
                 {"role": "user", "content": f"{player} says: {message}"}
@@ -73,8 +72,6 @@ def chat():
         print(f"[ERROR] Failed to process message from {player}: {e}")
         return "", 200
 
-
 if __name__ == "__main__":
-    # Use PORT environment variable for Replit compatibility, fallback to 81
     port = int(os.environ.get("PORT", 81))
     app.run(host="0.0.0.0", port=port)
