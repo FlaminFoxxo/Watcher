@@ -51,22 +51,18 @@ def chat():
     try:
         print(f"[Watcher] {player} said: {message}")
 
-        response = openai.ChatCompletion.create(model="gpt-4",
-                                                messages=[{
-                                                    "role":
-                                                    "system",
-                                                    "content":
-                                                    CREEPY_RULES
-                                                }, {
-                                                    "role":
-                                                    "user",
-                                                    "content":
-                                                    f"{player} says: {message}"
-                                                }],
-                                                temperature=0.85,
-                                                max_tokens=60)
+response = openai.chat.completions.create(
+    model="gpt-4",
+    messages=[
+        {"role": "system", "content": CREEPY_RULES},
+        {"role": "user", "content": f"{player} says: {message}"}
+    ],
+    temperature=0.85,
+    max_tokens=60
+)
 
-        reply = response.choices[0].message["content"].strip()
+reply = response.choices[0].message.content.strip()
+
 
         if not reply or len(reply) < 5:
             return "", 200
